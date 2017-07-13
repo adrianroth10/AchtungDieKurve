@@ -1,5 +1,5 @@
-#ifndef U_GAME_H
-#define U_GAME_H
+#ifndef OFFLINE_H
+#define OFFLINE_H
 
 #include<string.h>
 #include"extras.h"

@@ -1,4 +1,4 @@
-VPATH = ../src / ../tdd/ ../ulrica/
+VPATH = ../src / ../tdd/
 
 CC = cc
 CFLAGS  = -std=c11 -pedantic -Wall -Werror -g -funsigned-char -I../include/
@@ -12,7 +12,7 @@ CLIENT_LIBS = -lSDL2 -lSDL2_ttf -pthread
 
 .PHONY: clean clean_test all test compile
 
-all: server_run.out client_run.out u_game.out
+all: server_run.out client_run.out offline.out
 
 server_run.out: $(SERVER_OBJS) server_run.o
 	$(CC) $(OFLAGS) -o $@ $^ $(SERVER_LIBS)
@@ -27,8 +27,8 @@ clean:
 	rm -f *.o *.out
 
 
-############### ULRICA ################
-u_game.out: u_game.o extras.o client_graphics.o client_run3.o game3.o
+############### OFFLINE ################
+offline.out: offline.o extras.o client_graphics.o client_run3.o game3.o
 	$(CC) $(OFLAGS) -o $@ $^ -lSDL2 -lSDL2_ttf -pthread
 
 game3.o: game.c

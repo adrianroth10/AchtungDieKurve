@@ -1,6 +1,6 @@
 // The offline version of the game,
 // lots of methods are overwritten to avoid duplication of code
-#include"u_game.h"
+#include"offline.h"
 #include"game_identifiers.h"
 #include"game.h"
 
