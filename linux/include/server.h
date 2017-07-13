@@ -1,7 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include<arpa/inet.h> 
+#include<arpa/inet.h>
 #include<ctype.h>
 #include<pthread.h>
 #include<stdio.h>
@@ -16,8 +16,7 @@
 
 typedef int SOCKET;
 
-struct client
-{
+struct client {
   unsigned short uid;
   SOCKET socket;
   struct sockaddr_in cli_addr;
@@ -25,22 +24,12 @@ struct client
   char name[10];
 };
 
-/*
-struct clients
-{
-  struct client client[10];
-  short size;
-};
-*/
-
-struct clients
-{
+struct clients {
 	struct node* first;
 	int size;
 };
 
-struct node
-{
+struct node {
 	struct client* client;
 	struct node* next;
 };

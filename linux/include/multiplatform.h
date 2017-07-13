@@ -1,3 +1,4 @@
+// Currently not used and the code has been doubled to make it work
 #ifndef MULTIPLATFORM_H
 #define MULTIPLATFORM_H
 
@@ -5,7 +6,8 @@
 #define THREAD HANDLE
 #define THREADFUNC DWORD WINAPI
 #define THREADRETURN 0
-#define THREAD_CREATE(handle, function, data) *handle = CreateThread(NULL, 0, function, data, 0, NULL)
+#define THREAD_CREATE(handle, function, data) \
+	*handle = CreateThread(NULL, 0, function, data, 0, NULL)
 #define THREAD_WAIT(handle) WaitForSingleObject(*handle, INFINITE)
 #define MUTEX HANDLE
 #define MUTEX_CREATE(handle) *handle = CreateMutex(NULL, FALSE, NULL)
@@ -20,7 +22,8 @@
 #define THREAD pthread_t
 #define THREADFUNC void*
 #define THREADRETURN NULL
-#define THREAD_CREATE(handle, function, data) pthread_create(handle, NULL, function, data)
+#define THREAD_CREATE(handle, function, data) \
+	pthread_create(handle, NULL, function, data)
 #define THREAD_WAIT(handle) pthread_join(*handle, NULL)
 #define MUTEX pthread_mutex_t
 #define MUTEX_CREATE(handle) pthread_mutex_init(handle, NULL)

@@ -1,3 +1,4 @@
+// Header for the graphics department
 #ifndef CLIENT_GRAPHICS_H
 #define CLIENT_GRAPHICS_H
 

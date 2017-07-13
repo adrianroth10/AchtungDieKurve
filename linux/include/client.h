@@ -7,7 +7,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<sys/socket.h>
-#include<unistd.h> 
+#include<unistd.h>
 
 #ifdef DEBUG
 #include"test_client.h"
@@ -15,7 +15,7 @@
 
 typedef int SOCKET;
 
-struct server{
+struct server {
         SOCKET socket;
         struct sockaddr_in serv_addr;
 };

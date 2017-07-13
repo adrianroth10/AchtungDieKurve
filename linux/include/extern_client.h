@@ -1,3 +1,5 @@
+// Not really sure what this does but
+// somehow helps the offline game
 #ifndef EXTERN_H
 #define EXTERN_H
 
