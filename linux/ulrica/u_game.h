@@ -16,7 +16,7 @@
 #include"extern_server.h"
 #include"extern_client.h"
 
-struct players{
+struct players {
 	int left;
 	int right;
 };
