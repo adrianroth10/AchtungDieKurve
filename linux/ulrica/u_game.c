@@ -5,7 +5,7 @@
 static struct players *p;
 static struct graphics_player *p2;
 int playing;
-static int l, u = -1; 
+static int l, u = -1;
 static SDL_Thread* events_t;
 
 #define send_to_all_game game_msg
@@ -39,11 +39,11 @@ static int thread_check_events2(void *data)
 		{
 			if(event == p[i].left)
 			{
-				change_dir(UP_1L, i);
+				change_dir(i, UP_1L);
 			}
 			else if(event == p[i].right)
 			{
-				change_dir(UP_1R, i);
+				change_dir(i, UP_1R);
 			}
 		}
 	}
@@ -64,11 +64,38 @@ void print_controlls()
 	}
 }
 
+struct node *getName(int i)
+{
+	char *ret;
+	struct node *node;
+	node = malloc(sizeof(struct node));
+	node->next = NULL;
+	node->client = malloc(sizeof(struct client));
+	printf("Namn på spelare %d\n", i+1);
+	if((ret = fgets(p2[i].name, 10, stdin)) == NULL)
+	{
+		exit(1);
+	}
+	p2[i].name[strlen(p2[i].name)-1] = '\0';
+	if(strcmp(p2[i].name, "Ulrica") == 0 || strcmp(p2[i].name, "ulrica") == 0)
+	{
+		printf("Vad kul att du ska vara med och spela %s!\n", p2[i].name);
+		u = i;
+		delay(1000);
+	}
+	p[i].left = 2*i + 3;
+	p[i].right = 2*i + 4;
+	strcpy(node->client->name, p2[i].name);
+	node->client->uid = i;
+	return node;
+}
+
 int main(int argc, char* argv[])
 {
 	char input[10], *ret;
 	int i;
 	struct clients clients;
+	struct node *last;
 
 	printf("Välkommen till AchtungDieUlrica!\n");
 	delay(3000);
@@ -82,34 +109,23 @@ int main(int argc, char* argv[])
 		input[strlen(input)-1] = '\0';
 		l = string_to_int(input);
 	}while (l <= 0);
-	
+
 	if (l > 5)
 	{
 		printf("Oj va många ni var, ni blir 5 personer då\n");
 		l = 5;
 		delay(1000);
 	}
-	
+
 	p = calloc(l, sizeof(struct players));
 	p2 = calloc(l, sizeof(struct graphics_player));
 	clients.size = l;
-	for(i = 0; i < l; i++)
+	clients.first = getName(0);
+	last = clients.first;
+	for(i = 1; i < l; i++)
 	{
-		printf("Namn på spelare %d\n", i+1);
-		if((ret = fgets(p2[i].name, 10, stdin)) == NULL)
-		{
-			return 1;
-		}
-		p2[i].name[strlen(p2[i].name)-1] = '\0';
-		if(strcmp(p2[i].name, "Ulrica") == 0 || strcmp(p2[i].name, "ulrica") == 0)
-		{
-			printf("Vad kul att du ska vara med och spela %s!\n", p2[i].name);
-			u = i;
-			delay(1000);
-		}
-		p[i].left = 2*i + 3;
-		p[i].right = 2*i + 4;
-		strcpy(clients.client[i].name, p2[i].name);
+		last->next = getName(i);
+		last = last->next;
 	}
 	print_controlls();
 	delay(3000);
@@ -119,5 +135,6 @@ int main(int argc, char* argv[])
 	play(0, 20, 0, &clients);
 	SDL_WaitThread(events_t, NULL);
 	free(p);
+	//freeClients(clients);
 	return 0;
 }

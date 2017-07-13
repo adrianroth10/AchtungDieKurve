@@ -169,7 +169,7 @@ void go()
 		{
 			playing = 0;
 			printf("%s\n", p[winner].name);
-		}	
+		}
 	}
 }
 

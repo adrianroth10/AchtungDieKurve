@@ -12,7 +12,7 @@ CLIENT_LIBS = -lSDL2 -lSDL2_ttf -pthread
 
 .PHONY: clean clean_test all test compile
 
-all: server_run.out client_run.out
+all: server_run.out client_run.out u_game.out
 
 server_run.out: $(SERVER_OBJS) server_run.o
 	$(CC) $(OFLAGS) -o $@ $^ $(SERVER_LIBS)
@@ -23,15 +23,11 @@ client_run.out: $(CLIENT_OBJS) client_run.o
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $<
 
-clean: 
+clean:
 	rm -f *.o *.out
 
 
 ############### ULRICA ################
-#u_game.out: u_game.o extras.o client_graphics.o 
-#	$(CC) $(OFLAGS) -o $@ $^ -lSDL2 -lSDL2_ttf -pthread
-
-
 u_game.out: u_game.o extras.o client_graphics.o client_run3.o game3.o
 	$(CC) $(OFLAGS) -o $@ $^ -lSDL2 -lSDL2_ttf -pthread
 
@@ -55,9 +51,9 @@ test: test_server test_client clean_test
 	@echo Done all
 
 clean_test: clean_test_server clean_test_client
-	rm output 
+	rm output
 
-clean_test_server: 
+clean_test_server:
 	rm test_server.o compile_server.out server_run2.o game2.o
 
 clean_test_client:
@@ -102,7 +98,7 @@ test_client: compile_client $(CLIENT_TEST_CASES)
 compile_client.out: test_client.o client_graphics.o client.o client_run2.o
 	$(CC) $(OFLAGS) -o $@ $^ $(CLIENT_LIBS)
 
-test_client.o: test_client.c 
+test_client.o: test_client.c
 	$(CC) $(CFLAGS) -c $< ../include/client.h
 
 test_graphics.out: test_graphics.c client_graphics.o extras.o
@@ -116,7 +112,7 @@ client_case_chat:
 	rm -f output
 	./compile_client.out < tdd/client_input_chat > output
 	diff output tdd/client_output_chat
-	
+
 client_case_game:
 	rm output
 	./compile_client.out < tdd/client_input_game > output
