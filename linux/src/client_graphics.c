@@ -1,3 +1,4 @@
+// All functions needed for the graphics
 #include"client_graphics.h"
 
 int init_window, init_system;
@@ -12,57 +13,91 @@ static SDL_mutex *lock;
 void init_colors()
 {
 	colors = malloc(10*sizeof(SDL_Color));
-	colors[0] = (SDL_Color){.r = 255, .g = 255, .b = 255, .a = 255};
-	colors[1] = (SDL_Color){.r = 255, .g = 0, .b = 0, .a = 255};
-	colors[2] = (SDL_Color){.r = 0, .g = 255, .b = 0, .a = 255};
-	colors[3] = (SDL_Color){.r = 0, .g = 0, .b = 255, .a = 255};
-	colors[4] = (SDL_Color){.r = 0, .g = 255, .b = 255, .a = 255};
-	colors[5] = (SDL_Color){.r = 255, .g = 0, .b = 255, .a = 255};
-	colors[6] = (SDL_Color){.r = 255, .g = 255, .b = 0, .a = 255};
-	colors[7] = (SDL_Color){.r = 255, .g = 128, .b = 0, .a = 255};
-	colors[8] = (SDL_Color){.r = 128, .g = 128, .b = 128, .a = 255};
-	colors[9] = (SDL_Color){.r = 255, .g = 51, .b = 153, .a = 255};
+	colors[0] = (SDL_Color){.r = 255,
+				.g = 255,
+				.b = 255,
+				.a = 255};
+	colors[1] = (SDL_Color){.r = 255,
+				.g = 0,
+				.b = 0,
+				.a = 255};
+	colors[2] = (SDL_Color){.r = 0,
+				.g = 255,
+				.b = 0,
+				.a = 255};
+	colors[3] = (SDL_Color){.r = 0,
+				.g = 0,
+				.b = 255,
+				.a = 255};
+	colors[4] = (SDL_Color){.r = 0,
+				.g = 255,
+				.b = 255,
+				.a = 255};
+	colors[5] = (SDL_Color){.r = 255,
+				.g = 0,
+				.b = 255,
+				.a = 255};
+	colors[6] = (SDL_Color){.r = 255,
+				.g = 255,
+				.b = 0,
+				.a = 255};
+	colors[7] = (SDL_Color){.r = 255,
+				.g = 128,
+				.b = 0,
+				.a = 255};
+	colors[8] = (SDL_Color){.r = 128,
+				.g = 128,
+				.b = 128,
+				.a = 255};
+	colors[9] = (SDL_Color){.r = 255,
+				.g = 51,
+				.b = 153,
+				.a = 255};
 }
 
 void init_sdl(struct graphics_player *p, int l)
 {
-	if(init_window)
+	if (init_window) {
 		return;
-
+	}
 	SDL_Surface *text;
 
-	if(!init_system)
-	{
+	if (!init_system) {
 		SDL_Init(SDL_INIT_VIDEO);
 		TTF_Init();
 		atexit(SDL_Quit);
 		atexit(TTF_Quit);
 	}
-	if ((lock = SDL_CreateMutex()) == 0)
-	{
+	if ((lock = SDL_CreateMutex()) == 0) {
 		printf("\n mutex init failed\n");
 		exit(1);
 	}
-	window = SDL_CreateWindow("Achtung", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, 0); 
+	window = SDL_CreateWindow("Achtung",
+				  SDL_WINDOWPOS_UNDEFINED,
+				  SDL_WINDOWPOS_UNDEFINED,
+				  WIDTH,
+				  HEIGHT,
+				  0);
 	renderer = SDL_CreateRenderer(window, -1, 0);
 	surface = SDL_GetWindowSurface(window);
 	SDL_RenderClear(renderer);
-	init_colors();	
+	init_colors();
 	font = TTF_OpenFont("OpenSans-Regular.ttf", 12);
 	players = p;
 
 	init_window = 1;
 	int y;
-	for (y = 0; y<HEIGHT; y++)
-	{
+	for (y = 0; y<HEIGHT; y++) {
 		color_pixel(0, WIDTH-MENU_WIDTH, y);
 	}
 	SDL_Rect r;
 	char out[14];
 
-	for (y = 0; y < l; y++)
-	{
-		r = (SDL_Rect) {WIDTH - MENU_WIDTH + 10, 10 + y*20, 70, 20};
+	for (y = 0; y < l; y++) {
+		r = (SDL_Rect) {WIDTH - MENU_WIDTH + 10,
+				10 + y*20,
+				70,
+				20};
 		players[y].r = r;
 		snprintf(out, 14, "%s: %d", p[y].name, 0);
 		text = TTF_RenderText_Solid(font, out, colors[y]);
@@ -76,8 +111,9 @@ void init_sdl(struct graphics_player *p, int l)
 
 void close_window()
 {
-	if(!init_window)
+	if (!init_window) {
 		return;
+	}
 	SDL_LockMutex(lock);
 	init_window = 0;
 	free(colors);
@@ -92,8 +128,9 @@ void close_window()
 
 void clear_window()
 {
-	if(!init_window)
+	if (!init_window) {
 		return;
+	}
 	SDL_LockMutex(lock);
 	SDL_Rect r;
 	r = (SDL_Rect) {0,0,WIDTH-MENU_WIDTH,HEIGHT};
@@ -103,55 +140,59 @@ void clear_window()
 
 void color_pixel(int color, int x, int y)
 {
-	if(!init_window)
+	if (!init_window) {
 		return;
+	}
 	SDL_LockMutex(lock);
 	Uint32 *pixels;
 	SDL_Color c;
 
 	c = colors[color];
-	if (x<0 || y<0 || x>WIDTH-1 || y>HEIGHT-1)
-	{
+	if (x<0 || y<0 || x>WIDTH-1 || y>HEIGHT-1) {
 		SDL_UnlockMutex(lock);
 		return;
 	}
-	pixels = (Uint32*) surface->pixels; 
+	pixels = (Uint32*) surface->pixels;
 	pixels[x+y*WIDTH] = SDL_MapRGB(surface->format, c.r, c.g, c.b);
 	SDL_UnlockMutex(lock);
 }
 
 void change_points(int color, int points)
 {
-	if(!init_window)
+	if (!init_window) {
 		return;
+	}
 	SDL_LockMutex(lock);
 	char out[14];
 	SDL_Surface *text;
 
 	snprintf(out, 14, "%s: %d", players[color].name, points);
 	text = TTF_RenderText_Solid(font, out, colors[color]);
-	if(text == NULL)
+	if (text == NULL) {
 		return;
-	SDL_FillRect(surface, &(players[color].r), SDL_MapRGB(surface->format, 0,0,0));
+	}
+	SDL_FillRect(surface,
+		     &(players[color].r),
+		     SDL_MapRGB(surface->format, 0, 0, 0));
 	SDL_BlitSurface(text, NULL, surface, &(players[color].r));
 	SDL_FreeSurface(text);
 	SDL_UnlockMutex(lock);
-}	
+}
 
 void update_window()
 {
-	if(!init_window)
+	if (!init_window) {
 		return;
+	}
 	SDL_LockMutex(lock);
 	SDL_Texture *texture;
-	if((texture = SDL_CreateTextureFromSurface(renderer, surface)) == NULL)
-	{
+	if ((texture = SDL_CreateTextureFromSurface(renderer, surface))
+			== NULL) {
 		fprintf(stderr, "error allocating texture");
 		exit(1);
 	}
 	SDL_RenderClear(renderer);
-	if(SDL_RenderCopy(renderer, texture, NULL, NULL) < 0)
-	{
+	if (SDL_RenderCopy(renderer, texture, NULL, NULL) < 0) {
 		fprintf(stderr, "error rendercopy");
 		exit(1);
 	}
@@ -162,17 +203,17 @@ void update_window()
 
 int get_event()
 {
-	if(!init_system)
+	if (!init_system) {
 		return NONE;
+	}
 	SDL_Event event;
-	if(!SDL_PollEvent(&event))
+	if (!SDL_PollEvent(&event)) {
 		return NONE;
-	if (event.type == SDL_QUIT) 
+	}
+	if (event.type == SDL_QUIT) {
 		return QUIT;
-	else if (event.type == SDL_KEYDOWN)
-	{
-		switch(event.key.keysym.sym)
-		{
+	} else if (event.type == SDL_KEYDOWN) {
+		switch (event.key.keysym.sym) {
 			case SDLK_LEFT:
 				return DOWN_LEFT;
 				break;
@@ -180,11 +221,8 @@ int get_event()
 				return DOWN_RIGHT;
 				break;
 		}
-	}
-	else if (event.type == SDL_KEYUP)
-	{
-		switch(event.key.keysym.sym)
-		{
+	} else if (event.type == SDL_KEYUP) {
+		switch (event.key.keysym.sym) {
 			case SDLK_LEFT:
 				return UP_1L;
 				break;
@@ -222,25 +260,3 @@ int get_event()
 	}
 	return NONE;
 }
-/*
-void run()
-{
-	int a = 0;
-	while(1)
-	{
-		a = get_event();
-		if (a == 3)
-		{
-			printf("Left\n");
-		}
-		if (a == 4)
-		{
-			printf("Right\n");
-		}
-		if (a == -1)
-		{
-			break;
-		}
-	}
-}
-*/

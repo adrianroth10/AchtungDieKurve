@@ -1,3 +1,5 @@
+// Runnning the client for the game
+// Using the helping functions from client.c
 #include"client_graphics.h"
 #include"game_identifiers.h"
 #include"client.h"
@@ -10,23 +12,21 @@ SDL_Thread *events;
 int string_to_int(char* in)
 {
 	int nbr, minus, i;
-	if(in == NULL || strlen(in) == 0)
+	if (in == NULL || strlen(in) == 0) {
 		return -2;
-	if(in[0] == '-')
-	{
+	}
+	if (in[0] == '-') {
 		minus = -1;
 		i = 1;
-	}
-	else
-	{
+	} else {
 		minus = 1;
 		i = 0;
 	}
 	nbr = 0;
-	for (; i < strlen(in); i++)
-	{
-		if(!isdigit(in[i]))
+	for (; i < strlen(in); i++) {
+		if (!isdigit(in[i])) {
 			return -2;
+		}
 		nbr *= 10;
 		nbr += in[i] - '0';
 	}
@@ -40,10 +40,10 @@ static int thread_check_events(void *data)
 	char msg[3];
 	msg[0] = GAME_MSG;
 	msg[2] = '\0';
-	while(playing && (event = get_event()) != -1)
-	{
-		if(event == 0)
+	while (playing && (event = get_event()) != -1) {
+		if (event == 0) {
 			continue;
+		}
 		msg[1] = event + '0';
 		cli_send(msg);
 	}
@@ -52,10 +52,10 @@ static int thread_check_events(void *data)
 	snprintf(send_msg, 4, "%c%d", GAME_MSG, QUIT);
 	cli_send(send_msg);
 	close_window();
-	while(!playing)
-	{
-		if(get_event() == -1)
+	while (!playing) {
+		if (get_event() == -1) {
 			exit(3);
+		}
 	}
 	return 0;
 }
@@ -66,13 +66,12 @@ void go_cli()
 	int i;
 	struct graphics_player *players;
 	players = calloc(l, sizeof(struct graphics_player));
-	for(i = 0; i < l; i++)
-	{
+	for (i = 0; i < l; i++) {
 		name = strtok(NULL, " ");
 		if(name == NULL)
 			return;
 		strcpy(players[i].name, name);
-	} 
+	}
 	init_sdl((struct graphics_player*)players, l);
 	playing = 1;
 	printf("go\n");
@@ -83,32 +82,32 @@ void points(int length)
 {
 	char *p, *points;
 	int i, ip, ipoints;
-	for(i = 0; i < length; i++)
-	{
+	for (i = 0; i < length; i++) {
 		p = strtok(NULL, " ");
 		points = strtok(NULL, " ");
 		ip = string_to_int(p);
 		ipoints = string_to_int(points);
-		if(ip == -2 || ipoints == -2)
+		if (ip == -2 || ipoints == -2) {
 			return;
+		}
 		change_points(ip, ipoints);
 	}
 }
 
 void pixels(int length)
 {
-	char *col, *x, *y; 
+	char *col, *x, *y;
 	int i, icol, ix, iy;
-	for(i = 0; i < length; i++)
-	{
+	for (i = 0; i < length; i++) {
 		col = strtok(NULL, " ");
 		x = strtok(NULL, " ");
 		y = strtok(NULL, " ");
 		icol = string_to_int(col);
 		ix = string_to_int(x);
 		iy = string_to_int(y);
-		if(icol == -2 || ix == -2 || iy == -2)
+		if (icol == -2 || ix == -2 || iy == -2) {
 			return;
+		}
 		color_pixel(icol, ix, iy);
 	}
 }
@@ -118,11 +117,16 @@ char* chat_msg(char* first)
 	char print[100], *token;
 	int index = snprintf(print, 100, "%s", first);
 	token = strtok(NULL, " ");
-	while(token != NULL)
-	{
-		if(token[0] == GAME_MSG || (strncmp(token, GAME_START, 2) == 0 && !playing && isdigit(token[2])))
+	while (token != NULL) {
+		if (token[0] == GAME_MSG ||
+		    (strncmp(token, GAME_START, 2) == 0 &&
+		    !playing && isdigit(token[2]))) {
 			break;
-		index += snprintf(print + index, 100 - index, " %s", token);
+		}
+		index += snprintf(print + index,
+				  100 - index,
+				  " %s",
+				  token);
 		token = strtok(NULL, " ");
 	}
 	printf("%s\n", print);
@@ -131,37 +135,27 @@ char* chat_msg(char* first)
 
 void game_msg(char *recv_msg)
 {
-	char *type; 
+	char *type;
 	int length;
 	type = strtok(recv_msg, " ");
-	while (type != NULL)
-	{
-		if(strcmp(type, "exit") == 0)
-		{
+	while (type != NULL) {
+		if (strcmp(type, "exit") == 0) {
 			printf("server closed\n");
 			exit(3);
-		}
-		else if(strncmp(type, GAME_START, 2) == 0 && !playing && isdigit(type[2]))
-		{
+		} else if (strncmp(type, GAME_START, 2) == 0 &&
+			   !playing &&
+			   isdigit(type[2])) {
 			l = type[2] - '0';
 			go_cli();
-		}
-		else if(type[0] != GAME_MSG)
-		{
+		} else if (type[0] != GAME_MSG) {
 			type = chat_msg(type);
 			continue;
-		}
-		else if(type[1] == '1')
-		{
+		} else if (type[1] == '1') {
 			clear_window();
-		}
-		else if(type[1] == '2' && isdigit(type[2]))
-		{
+		} else if (type[1] == '2' && isdigit(type[2])) {
 			length = type[2] - '0';
 			points(length);
-		}
-		else if(type[1] == '3' && isdigit(type[2]))
-		{
+		} else if (type[1] == '3' && isdigit(type[2])) {
 			length = type[2] - '0';
 			pixels(length);
 		}
@@ -170,11 +164,12 @@ void game_msg(char *recv_msg)
 	update_window();
 }
 
-void* thread_recv(void *data){
+void* thread_recv(void *data)
+{
 	printf("receiving\n");
 	char *recv_msg;
 	recv_msg = calloc(256, sizeof(char));
-	while(1){
+	while (1) {
 		cli_get_msg(recv_msg, 256);
 		game_msg(recv_msg);
 	}
@@ -182,18 +177,19 @@ void* thread_recv(void *data){
 	return NULL;
 }
 
-void* thread_send(void *data){
+void* thread_send(void *data)
+{
 	printf("sending\n");
 	char send_msg[100];
-	while(1){
-		if (fgets(send_msg, 100, stdin) == NULL)
-		{
+	while (1) {
+		if (fgets(send_msg, 100, stdin) == NULL) {
 			printf("error fgets");
 			exit(1);
 		}
 		send_msg[strlen(send_msg)-1] = '\0';
-		if(strcmp(send_msg, "exit") == 0)
+		if (strcmp(send_msg, "exit") == 0) {
 			exit(3);
+		}
 		cli_send(send_msg);
 	}
 	return NULL;

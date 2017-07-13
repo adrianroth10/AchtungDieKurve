@@ -1,3 +1,4 @@
+// Help functions for the server
 #include"server.h"
 
 static SOCKET* listen_socket;
@@ -13,7 +14,7 @@ void error(char *msg)
 void init(int port)
 {
 	SOCKET temp;
-	if((temp = socket(AF_INET , SOCK_STREAM , 0 )) == -1){
+	if ((temp = socket(AF_INET , SOCK_STREAM , 0 )) == -1) {
 		error("socket error");
 	}
 	listen_socket = malloc(sizeof(SOCKET));
@@ -24,7 +25,10 @@ void init(int port)
 	(listen_server->sin_addr).s_addr = INADDR_ANY;
 	listen_server->sin_port = htons( port );
 
-	if( bind(*listen_socket ,(struct sockaddr *)listen_server , sizeof(*listen_server)) < 0){
+	if (bind(*listen_socket,
+		 (struct sockaddr *)listen_server,
+		 sizeof(*listen_server))
+	    < 0) {
 		error("bind error");
 	}
 	printf("Bind done\n");
@@ -49,8 +53,8 @@ struct clients* serv_listen(int port)
 
 void serv_send(char *message, struct client c)
 {
-	if(write(c.socket, message, strlen(message))<0){
-		error("error send"); 
+	if (write(c.socket, message, strlen(message)) < 0) {
+		error("error send");
 	}
 	//printf("data send\n");
 }
@@ -58,7 +62,7 @@ void serv_send(char *message, struct client c)
 void serv_get_msg(char *recv_msg, int size, struct client c)
 {
 	int length;
-	if((length = recv(c.socket, recv_msg, size, 0)) < 0){
+	if ((length = recv(c.socket, recv_msg, size, 0)) < 0) {
 		error("recive error");
 	}
 	recv_msg[length] = '\0';
@@ -71,9 +75,10 @@ struct client* serv_accept()
 	struct client *client;
 	client = malloc(sizeof(struct client));
 	c = sizeof(struct sockaddr_in);
-	client->socket = accept(*listen_socket, (struct sockaddr *)&client->cli_addr, (socklen_t*)&c);
-	if (client->socket < 0)
-	{
+	client->socket = accept(*listen_socket,
+				(struct sockaddr *)&client->cli_addr,
+				(socklen_t*)&c);
+	if (client->socket < 0) {
 		error("error accept");
 	}
 	printf("accept\n");
@@ -91,8 +96,7 @@ void serv_stop()
 	struct node *node;
 	struct node *last;
 	node = clients->first;
-	while(node != NULL)
-	{
+	while (node != NULL) {
 		serv_send("exit", *(node->client));
 		serv_disconnect(node->client);
 		last = node;
