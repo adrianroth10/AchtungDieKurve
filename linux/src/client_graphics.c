@@ -69,7 +69,7 @@ void init_sdl(struct graphics_player *p, int l)
 		atexit(TTF_Quit);
 	}
 	if ((lock = SDL_CreateMutex()) == 0) {
-		printf("\n mutex init failed\n");
+		fprintf(stderr, "\n mutex init failed\n");
 		exit(1);
 	}
 	window = SDL_CreateWindow("Achtung",
@@ -78,8 +78,13 @@ void init_sdl(struct graphics_player *p, int l)
 				  WIDTH,
 				  HEIGHT,
 				  0);
-	renderer = SDL_CreateRenderer(window, -1, 0);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
 	surface = SDL_GetWindowSurface(window);
+	if (!window || !renderer || !surface) {
+		fprintf(stderr, "Error loading window, renderer or surface: %s\n",
+				SDL_GetError());
+		exit(1);
+	}
 	SDL_RenderClear(renderer);
 	init_colors();
 	font = TTF_OpenFont("OpenSans-Regular.ttf", 12);
